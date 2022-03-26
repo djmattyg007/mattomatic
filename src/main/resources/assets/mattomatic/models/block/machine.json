@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "back": "mattomatic:block/machine_back",
+    "top": "mattomatic:block/machine_side",
+    "side": "mattomatic:block/machine_side",
+    "south": "#back"
+  }
+}

@@ -1,7 +1,13 @@
 package net.matthewgamble.mattomatic;
 
+import net.matthewgamble.mattomatic.block.ModBlocks;
+import net.matthewgamble.mattomatic.container.ModContainers;
+import net.matthewgamble.mattomatic.item.ModItems;
+import net.matthewgamble.mattomatic.screen.ProcessQueueScreen;
+import net.matthewgamble.mattomatic.tileentity.ModTileEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,9 +34,15 @@ public class MattomaticMod
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MattomaticMod() {
+    public MattomaticMod()
+    {
         // Register the setup method for modloading
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ModItems.register(eventBus);
+        ModBlocks.register(eventBus);
+        ModTileEntities.register(eventBus);
+        ModContainers.register(eventBus);
 
         eventBus.addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -46,7 +58,12 @@ public class MattomaticMod
 
     public static String modId(String key)
     {
-        return MOD_ID + ":" + key;
+        return modId(":", key);
+    }
+
+    public static String modId(String sep, String key)
+    {
+        return MOD_ID + sep + key;
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -59,6 +76,13 @@ public class MattomaticMod
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().options);
+
+        event.enqueueWork(() -> {
+            ScreenManager.register(
+                ModContainers.PROCESS_QUEUE_CONTAINER.get(),
+                ProcessQueueScreen::new
+            );
+        });
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event)
@@ -77,7 +101,8 @@ public class MattomaticMod
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+    public void onServerStarting(FMLServerStartingEvent event)
+    {
         // do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
@@ -85,7 +110,8 @@ public class MattomaticMod
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
+    public static class RegistryEvents
+    {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here

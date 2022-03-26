@@ -1,1 +1,7 @@
-{}
+{
+  "item.mattomatic.process_queue": "Process Queue",
+  "block.mattomatic.process_queue": "Process Queue",
+  "screen.mattomatic.process_queue": "Process Queue",
+  "mattomatic.process_queue.button.horizontal.tooltip": "Move items from left to right",
+  "mattomatic.process_queue.button.vertical.tooltip": "Move items from top to bottom"
+}

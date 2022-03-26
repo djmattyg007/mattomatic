@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mattomatic:block/process_queue"
+    },
+    "facing=south": {
+      "model": "mattomatic:block/process_queue",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "mattomatic:block/process_queue",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "mattomatic:block/process_queue",
+      "y": 270
+    }
+  }
+}

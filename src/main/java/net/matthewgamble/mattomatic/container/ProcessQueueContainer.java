@@ -14,8 +14,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-import java.util.function.Supplier;
-
 public class ProcessQueueContainer extends BaseContainer
 {
     private final ProcessQueueTile tileEntity;
@@ -60,7 +58,7 @@ public class ProcessQueueContainer extends BaseContainer
 
         int x = 134;
         for (int i = 0; i < ProcessQueue.QUEUE_SIZE; i++) {
-            addSlot(new ReadOnlySlot(this.queueInv, i, x, 17));
+            addSlot(new ViewOnlySlot(this.queueInv, i, x, 17));
             x -= 18;
         }
 
@@ -118,7 +116,7 @@ public class ProcessQueueContainer extends BaseContainer
     @Override
     public boolean canDragTo(Slot slot)
     {
-        return !(slot instanceof ReadOnlySlot);
+        return !(slot instanceof ViewOnlySlot);
     }
 
     @Override

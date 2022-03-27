@@ -5,9 +5,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ReadOnlySlot extends Slot
+public class ViewOnlySlot extends Slot
 {
-    public ReadOnlySlot(IInventory inv, int slot, int x, int y)
+    public ViewOnlySlot(IInventory inv, int slot, int x, int y)
     {
         super(inv, slot, x, y);
     }

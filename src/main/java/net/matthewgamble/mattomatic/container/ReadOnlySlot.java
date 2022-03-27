@@ -24,14 +24,14 @@ public class ReadOnlySlot extends Slot
         return false;
     }
 
-    @Override
-    public void set(ItemStack stack)
-    {
-    }
+//    @Override
+//    public void set(ItemStack stack)
+//    {
+//    }
 
-    @Override
-    public ItemStack remove(int amount)
-    {
-        return ItemStack.EMPTY;
-    }
+//    @Override
+//    public ItemStack remove(int amount)
+//    {
+//        return ItemStack.EMPTY;
+//    }
 }

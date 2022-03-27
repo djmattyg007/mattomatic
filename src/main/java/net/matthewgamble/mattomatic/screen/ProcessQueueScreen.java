@@ -30,7 +30,6 @@ public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
     public ProcessQueueScreen(ProcessQueueContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
         super(screenContainer, inv, titleIn);
-        screenContainer.setListener(this::onContainerChange);
     }
 
     @Override

@@ -10,11 +10,13 @@ import javax.annotation.Nonnull;
 public class ExtractOnlySlot extends Slot
 {
     private final IItemHandler itemHandler;
+    private final int realSlot;
 
     public ExtractOnlySlot(IItemHandler itemHandler, int slot, int x, int y)
     {
-        super(new Inventory(0), slot, x, y);
+        super(new Inventory(1), 0, x, y);
         this.itemHandler = itemHandler;
+        this.realSlot = slot;
     }
 
     @Override
@@ -27,18 +29,19 @@ public class ExtractOnlySlot extends Slot
     @Nonnull
     public ItemStack getItem()
     {
-        return this.itemHandler.getStackInSlot(getSlotIndex());
+        return this.itemHandler.getStackInSlot(this.realSlot);
     }
 
-    @Override
-    public void set(ItemStack stack)
-    {
-    }
+//    @Override
+//    public void set(ItemStack stack)
+//    {
+//    }
 
     @Override
     public ItemStack remove(int amount)
     {
-        return this.itemHandler.extractItem(getSlotIndex(), amount, false);
+        super.remove(amount);
+        return this.itemHandler.extractItem(this.realSlot, amount, false);
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ExtractOnlySlot extends Slot
     @Override
     public int getMaxStackSize()
     {
-        return this.itemHandler.getSlotLimit(getSlotIndex());
+        return this.itemHandler.getSlotLimit(this.realSlot);
     }
 
     @Override

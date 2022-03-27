@@ -174,6 +174,9 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InternalAddResult fillResult = this.fillQueue(addResult.stack, simulate);
             if (!simulate && (addResult.changed || fillResult.changed)) {
                 this.setChanged();
+                this.activeContainers.forEach((container) -> {
+                    container.handleQueueUpdate(this.getQueueItems());
+                });
             }
             return fillResult.stack;
         }
@@ -302,7 +305,9 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 
     public void addListener(ProcessQueueContainer container)
     {
-        this.activeContainers.add(container);
+        if (this.level != null && !this.level.isClientSide) {
+            this.activeContainers.add(container);
+        }
     }
 
     public void removeListener(ProcessQueueContainer container)
@@ -322,22 +327,18 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         }
         this.cooldownTime = 10;
 
-        System.out.println("ticking, queue size before: " + this.queue.size());
         if (!this.outputStack.isEmpty() || this.queue.size() == 0) {
             return;
         }
 
+        System.out.println("ticking, queue size before: " + this.queue.size());
         this.outputStack = this.queue.removeFirst();
         System.out.println("ticking, queue size after: " + this.queue.size());
         System.out.println("ticking, new output stack is: " + outputStack.getCount() + " " + outputStack.getDisplayName().plainCopy().getString());
         this.setChanged();
-    }
-
-    @Override
-    public void setChanged()
-    {
-        System.out.println("set changed!");
-        super.setChanged();
+        this.activeContainers.forEach((container) -> {
+            container.handleQueueUpdate(this.getQueueItems());
+        });
     }
 
     @Nullable
@@ -475,6 +476,8 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         for (ItemStack queueItemStack : this.queue) {
             InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), queueItemStack);
         }
+        this.queue = makeQueue();
+        this.setChanged();
     }
 
     private class InternalAddResult
@@ -506,7 +509,7 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
 
@@ -606,7 +609,7 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
 

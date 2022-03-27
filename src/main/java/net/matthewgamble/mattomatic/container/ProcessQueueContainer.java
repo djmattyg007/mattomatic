@@ -21,7 +21,7 @@ public class ProcessQueueContainer extends BaseContainer
     private final ProcessQueueTile tileEntity;
     private final IItemHandlerModifiable playerInv;
     private final IIntArray data;
-    private Runnable listener;
+    private final ReadOnlyInventory queueInv;
 
     public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data)
     {
@@ -38,19 +38,46 @@ public class ProcessQueueContainer extends BaseContainer
 
         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
             addSlot(new InsertOnlySlot(h, 0, 26, 53));
-            addSlot(new ExtractOnlySlot(h, 1, 134, 53));
+            addSlot(new ExtractOnlySlot(h, 1, 134, 53) {
+                @Override
+                public void setChanged()
+                {
+                    super.setChanged();
+                    ProcessQueueContainer.this.slotsChanged(this.container);
+                }
+            });
         });
 
-        Supplier<Iterable<ItemStack>> queueSupplier = this.tileEntity::getQueueItems;
-        ReadOnlyInventory queueInv = new ReadOnlyInventory(queueSupplier, ProcessQueue.QUEUE_SIZE);
+        //Supplier<Iterable<ItemStack>> queueSupplier = this.tileEntity::getQueueItems;
+        this.queueInv = new ReadOnlyInventory(/*queueSupplier, */ProcessQueue.QUEUE_SIZE) {
+            @Override
+            public void setChanged()
+            {
+                super.setChanged();
+                ProcessQueueContainer.this.slotsChanged(this);
+            }
+        };
 
         int x = 134;
         for (int i = 0; i < ProcessQueue.QUEUE_SIZE; i++) {
-            addSlot(new ReadOnlySlot(queueInv, i, x, 17));
+            addSlot(new ReadOnlySlot(this.queueInv, i, x, 17));
             x -= 18;
         }
 
         addDataSlots(this.data);
+    }
+
+    public void handleQueueUpdate(Iterable<ItemStack> queue)
+    {
+        int slot = 0;
+        for (ItemStack stack : queue) {
+            this.queueInv.setItem(slot, stack);
+            slot++;
+        }
+
+        for (; slot < ProcessQueue.QUEUE_SIZE; slot++) {
+            this.queueInv.setItem(slot, ItemStack.EMPTY);
+        }
     }
 
     @Override
@@ -72,21 +99,10 @@ public class ProcessQueueContainer extends BaseContainer
         );
     }
 
-    public void setListener(Runnable listener)
-    {
-        this.listener = listener;
-    }
-
-    public void onChanged()
-    {
-        if (this.listener != null) {
-            this.listener.run();
-        }
-    }
-
     @Override
     public void removed(PlayerEntity player)
     {
+        System.out.println("container removed");
         super.removed(player);
         if (!player.level.isClientSide) {
             this.tileEntity.removeListener(this);
@@ -97,6 +113,12 @@ public class ProcessQueueContainer extends BaseContainer
     public boolean canTakeItemForPickAll(ItemStack stack, Slot slot)
     {
         return false;
+    }
+
+    @Override
+    public boolean canDragTo(Slot slot)
+    {
+        return !(slot instanceof ReadOnlySlot);
     }
 
     @Override

@@ -46,8 +46,7 @@ public class ProcessQueueContainer extends BaseContainer
             });
         });
 
-        //Supplier<Iterable<ItemStack>> queueSupplier = this.tileEntity::getQueueItems;
-        this.queueInv = new ReadOnlyInventory(/*queueSupplier, */ProcessQueue.QUEUE_SIZE) {
+        this.queueInv = new ReadOnlyInventory(ProcessQueue.QUEUE_SIZE) {
             @Override
             public void setChanged()
             {

@@ -477,7 +477,11 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), queueItemStack);
         }
         this.queue = makeQueue();
+
         this.setChanged();
+        this.activeContainers.forEach((container) -> {
+            container.handleQueueUpdate(this.getQueueItems());
+        });
     }
 
     private class InternalAddResult

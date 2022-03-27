@@ -63,6 +63,8 @@ public class ProcessQueueContainer extends BaseContainer
         }
 
         addDataSlots(this.data);
+
+        this.handleQueueUpdate(this.tileEntity.getQueueItems());
     }
 
     public void handleQueueUpdate(Iterable<ItemStack> queue)

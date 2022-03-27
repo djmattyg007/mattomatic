@@ -37,12 +37,10 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 {
     public static final ITextComponent NAME = new TranslationTextComponent("screen.mattomatic.process_queue");
 
-    private ItemStack inputStack = ItemStack.EMPTY;
     private ItemStack outputStack = ItemStack.EMPTY;
 
     private LinkedList<ItemStack> queue = makeQueue();
 
-    // TODO: Consider whether to use Collections.unmodifiableMap() when supplying this externally.
     private final Map<Direction, MachineSideState> sideConfig = makeSideConfig();
 
     private int cooldownTime = -1;
@@ -200,6 +198,11 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InternalAddResult fillResult = this.fillQueue(remainder, simulate);
             if (!simulate) {
                 this.setChanged();
+                if (fillResult.changed) {
+                    this.activeContainers.forEach((container) -> {
+                        container.handleQueueUpdate(this.getQueueItems());
+                    });
+                }
             }
             return fillResult.stack;
         }
@@ -208,6 +211,11 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         InternalAddResult fillResult = this.fillQueue(addResult.stack, simulate);
         if (!simulate && (addResult.changed || fillResult.changed)) {
             this.setChanged();
+            if (fillResult.changed) {
+                this.activeContainers.forEach((container) -> {
+                    container.handleQueueUpdate(this.getQueueItems());
+                });
+            }
         }
         return fillResult.stack;
     }
@@ -283,7 +291,7 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 
     private ItemStack pullItemFromQueue(int amount, boolean simulate)
     {
-        if (this.outputStack.isEmpty()) {
+        if (this.outputStack.isEmpty() || amount <= 0) {
             return ItemStack.EMPTY;
         }
 
@@ -331,10 +339,7 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             return;
         }
 
-        System.out.println("ticking, queue size before: " + this.queue.size());
         this.outputStack = this.queue.removeFirst();
-        System.out.println("ticking, queue size after: " + this.queue.size());
-        System.out.println("ticking, new output stack is: " + outputStack.getCount() + " " + outputStack.getDisplayName().plainCopy().getString());
         this.setChanged();
         this.activeContainers.forEach((container) -> {
             container.handleQueueUpdate(this.getQueueItems());
@@ -345,7 +350,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public SUpdateTileEntityPacket getUpdatePacket()
     {
-        System.out.println("get update packet");
         CompoundNBT packetData = getUpdateTag();
         return new SUpdateTileEntityPacket(this.worldPosition, 36, packetData);
     }
@@ -353,7 +357,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
-        System.out.println("on data packet");
         CompoundNBT packetData = pkt.getTag();
         BlockState state = this.level.getBlockState(this.worldPosition);
         this.handleUpdateTag(state, packetData);
@@ -362,7 +365,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public CompoundNBT getUpdateTag()
     {
-        System.out.println("get update tag!");
         CompoundNBT updateTag = new CompoundNBT();
         this.save(updateTag);
         return updateTag;
@@ -371,7 +373,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public void handleUpdateTag(BlockState state, CompoundNBT tag)
     {
-        System.out.println("handle update tag");
         this.load(state, tag);
     }
 
@@ -467,7 +468,8 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player)
     {
-        return new ProcessQueueContainer(windowId, this, playerInventory, this.dataAccess);
+        IItemHandler invWrapper = new InvWrapper(this);
+        return new ProcessQueueContainer(windowId, this, playerInventory, this.dataAccess, invWrapper, invWrapper);
     }
 
     public void dropAllContents(World world, BlockPos pos)
@@ -563,7 +565,11 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack)
         {
-            return slot == 0;
+            if (slot != 0) {
+                return false;
+            }
+
+            return this.inv.sideConfig.get(this.side) == MachineSideState.INPUT;
         }
 
         @Nonnull
@@ -653,14 +659,14 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack)
         {
-            return slot == 0 || slot == 1;
+            return slot == 0;
         }
 
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
         {
-            if (slot != 0) {
+            if (!this.isItemValid(slot, stack)) {
                 return stack;
             }
 

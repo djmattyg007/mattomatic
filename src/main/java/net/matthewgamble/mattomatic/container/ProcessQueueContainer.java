@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -21,7 +21,7 @@ public class ProcessQueueContainer extends BaseContainer
     private final IIntArray data;
     private final ReadOnlyInventory queueInv;
 
-    public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data)
+    public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data, IItemHandler insertHandler, IItemHandler extractHandler)
     {
         super(ModContainers.PROCESS_QUEUE_CONTAINER.get(), containerId);
 
@@ -34,17 +34,8 @@ public class ProcessQueueContainer extends BaseContainer
 
         this.addPlayerInventorySlots(this.playerInv, 8, 86);
 
-        tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
-            addSlot(new InsertOnlySlot(h, 0, 26, 53));
-            addSlot(new ExtractOnlySlot(h, 1, 134, 53) {
-                @Override
-                public void setChanged()
-                {
-                    super.setChanged();
-                    ProcessQueueContainer.this.slotsChanged(this.container);
-                }
-            });
-        });
+        this.addSlot(new InsertOnlySlot(insertHandler, 0, 26, 53));
+        this.addSlot(new ExtractOnlySlot(extractHandler, 1, 134, 53));
 
         this.queueInv = new ReadOnlyInventory(ProcessQueue.QUEUE_SIZE) {
             @Override
@@ -57,11 +48,11 @@ public class ProcessQueueContainer extends BaseContainer
 
         int x = 134;
         for (int i = 0; i < ProcessQueue.QUEUE_SIZE; i++) {
-            addSlot(new ViewOnlySlot(this.queueInv, i, x, 17));
+            this.addSlot(new ViewOnlySlot(this.queueInv, i, x, 17));
             x -= 18;
         }
 
-        addDataSlots(this.data);
+        this.addDataSlots(this.data);
 
         this.handleQueueUpdate(this.tileEntity.getQueueItems());
     }
@@ -92,6 +83,9 @@ public class ProcessQueueContainer extends BaseContainer
         }
 
         return stillValid(
+            // TODO: This pos callable should be passed in through the constructor
+            // Once the listener system is eliminated (in favour of passing in another inventory for the queue),
+            // we'll no longer need to pass in the tile entity at all.
             IWorldPosCallable.create(world, this.tileEntity.getBlockPos()),
             player,
             ModBlocks.PROCESS_QUEUE.get()
@@ -123,28 +117,18 @@ public class ProcessQueueContainer extends BaseContainer
     @Override
     public ItemStack quickMoveStack(PlayerEntity player, int index)
     {
-        System.out.println("quick move, index: " + index);
-        System.out.println("quick move, total slots: " + this.slots.size());
         Slot sourceSlot = this.slots.get(index);
-        System.out.println("quick move, slot is " + (sourceSlot == null ? "null" : "not null"));
         if (sourceSlot == null || !sourceSlot.hasItem()) {
-            if (sourceSlot != null) {
-                System.out.println("quick move, slot has " + (sourceSlot.hasItem() ? "item" : "no item"));
-            }
             return ItemStack.EMPTY;
         }
 
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack sourceStackCopy = sourceStack.copy();
-        System.out.println("quick move, source slot contains " + sourceStack.getCount() + " " + sourceStack.getDisplayName().plainCopy().getString());
 
         if (index < 36) {
-            System.out.println("quick move, moving from player inventory");
             if (!this.moveItemStackTo(sourceStack, 36, 37, false)) {
-                System.out.println("quick move, guess it didn't work");
                 return ItemStack.EMPTY;
             }
-            System.out.println("quick move, cool beans");
         } else if (index == 36) {
             return ItemStack.EMPTY;
         } else if (index == 37) {

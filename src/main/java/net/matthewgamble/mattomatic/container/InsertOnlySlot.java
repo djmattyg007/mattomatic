@@ -21,13 +21,13 @@ public class InsertOnlySlot extends Slot
     @Override
     public boolean mayPickup(PlayerEntity player)
     {
-        return true;
+        return false;
     }
 
     @Override
     public boolean mayPlace(ItemStack stack)
     {
-        ItemStack remainder = this.itemHandler.insertItem(getSlotIndex(), stack, true);
+        ItemStack remainder = this.itemHandler.insertItem(this.getSlotIndex(), stack, true);
         return !remainder.equals(stack, true);
     }
 
@@ -41,7 +41,7 @@ public class InsertOnlySlot extends Slot
     @Override
     public void set(ItemStack stack)
     {
-        this.itemHandler.insertItem(getSlotIndex(), stack, false);
+        this.itemHandler.insertItem(this.getSlotIndex(), stack, false);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class InsertOnlySlot extends Slot
     @Override
     public int getMaxStackSize()
     {
-        return this.itemHandler.getSlotLimit(getSlotIndex());
+        return this.itemHandler.getSlotLimit(this.getSlotIndex());
     }
 
     @Override

@@ -22,13 +22,20 @@ public class ModContainers
 
     public static final RegistryObject<ContainerType<ProcessQueueContainer>> PROCESS_QUEUE_CONTAINER = CONTAINERS.register(
         "process_queue_container",
-        () -> IForgeContainerType.create((containerId, inv, data) -> {
+        () -> IForgeContainerType.create((containerId, playerInventory, data) -> {
             BlockPos pos = data.readBlockPos();
-            World world = inv.player.level;
+            World world = playerInventory.player.level;
 
             TileEntity tileEntity = world.getBlockEntity(pos);
             if (tileEntity instanceof ProcessQueueTile) {
-                return new ProcessQueueContainer(containerId, (ProcessQueueTile) tileEntity, inv, new IntArray(6));
+                return new ProcessQueueContainer(
+                    containerId,
+                    (ProcessQueueTile) tileEntity,
+                    playerInventory,
+                    new IntArray(6),
+                    new InsertOnlySlotItemHandler(),
+                    new ExtractOnlySlotItemHandler(1)
+                );
             } else {
                 throw new IllegalStateException("Incorrect or missing Process Queue tile entity.");
             }

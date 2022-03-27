@@ -17,7 +17,6 @@ public class ReadOnlyInventory implements IInventory
     {
         this.size = size;
         this.items = NonNullList.withSize(size, ItemStack.EMPTY);
-
     }
 
     @Override

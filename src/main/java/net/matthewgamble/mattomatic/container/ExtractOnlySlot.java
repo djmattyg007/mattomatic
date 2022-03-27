@@ -4,19 +4,18 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 
 public class ExtractOnlySlot extends Slot
 {
     private final IItemHandler itemHandler;
-    private final int realSlot;
 
     public ExtractOnlySlot(IItemHandler itemHandler, int slot, int x, int y)
     {
-        super(new Inventory(1), 0, x, y);
+        super(new Inventory(0), slot, x, y);
         this.itemHandler = itemHandler;
-        this.realSlot = slot;
     }
 
     @Override
@@ -29,19 +28,21 @@ public class ExtractOnlySlot extends Slot
     @Nonnull
     public ItemStack getItem()
     {
-        return this.itemHandler.getStackInSlot(this.realSlot);
+        return this.itemHandler.getStackInSlot(this.getSlotIndex());
     }
 
-//    @Override
-//    public void set(ItemStack stack)
-//    {
-//    }
+    @Override
+    public void set(ItemStack stack)
+    {
+        if (this.itemHandler instanceof IItemHandlerModifiable) {
+            ((IItemHandlerModifiable) this.itemHandler).setStackInSlot(this.getSlotIndex(), stack);
+        }
+    }
 
     @Override
     public ItemStack remove(int amount)
     {
-        super.remove(amount);
-        return this.itemHandler.extractItem(this.realSlot, amount, false);
+        return this.itemHandler.extractItem(this.getSlotIndex(), amount, false);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ExtractOnlySlot extends Slot
     @Override
     public int getMaxStackSize()
     {
-        return this.itemHandler.getSlotLimit(this.realSlot);
+        return this.itemHandler.getSlotLimit(this.getSlotIndex());
     }
 
     @Override

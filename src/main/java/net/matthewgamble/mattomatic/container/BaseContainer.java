@@ -2,7 +2,7 @@ package net.matthewgamble.mattomatic.container;
 
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.SlotItemHandler;
 
 public abstract class BaseContainer extends Container
@@ -12,7 +12,7 @@ public abstract class BaseContainer extends Container
         super(processQueueContainer, containerId);
     }
 
-    protected void addPlayerInventorySlots(IItemHandler handler, int leftColPos, int topRowPos)
+    protected void addPlayerInventorySlots(IItemHandlerModifiable handler, int leftColPos, int topRowPos)
     {
         int invRows = 3;
         int invCols = 9;
@@ -25,7 +25,7 @@ public abstract class BaseContainer extends Container
         addSlotRange(handler, 0, leftColPos, topRowPos, invCols, invSlotSideLen);
     }
 
-    private int addSlotBox(IItemHandler handler, int index, int x, int y, int xAmount, int dx, int yAmount, int dy)
+    private int addSlotBox(IItemHandlerModifiable handler, int index, int x, int y, int xAmount, int dx, int yAmount, int dy)
     {
         for (int i = 0; i < yAmount; i++) {
             index = addSlotRange(handler, index, x, y, xAmount, dx);
@@ -35,7 +35,7 @@ public abstract class BaseContainer extends Container
         return index;
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int xAmount, int dx)
+    private int addSlotRange(IItemHandlerModifiable handler, int index, int x, int y, int xAmount, int dx)
     {
         for (int i = 0; i < xAmount; i++) {
             addSlot(new SlotItemHandler(handler, index, x, y));

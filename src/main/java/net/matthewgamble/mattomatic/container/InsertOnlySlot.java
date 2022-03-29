@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 
 public class InsertOnlySlot extends Slot
 {
-    private final IItemHandler itemHandler;
+    protected final IItemHandler itemHandler;
 
     public InsertOnlySlot(IItemHandler itemHandler, int slot, int x, int y)
     {
@@ -28,7 +28,7 @@ public class InsertOnlySlot extends Slot
     public boolean mayPlace(ItemStack stack)
     {
         ItemStack remainder = this.itemHandler.insertItem(this.getSlotIndex(), stack, true);
-        return !remainder.equals(stack, true);
+        return !ItemStack.matches(remainder, stack);
     }
 
     @Override

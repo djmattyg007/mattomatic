@@ -1,5 +1,6 @@
 package net.matthewgamble.mattomatic.container;
 
+import net.matthewgamble.mattomatic.tileentity.IQueueInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -8,12 +9,12 @@ import net.minecraft.util.NonNullList;
 
 import java.util.List;
 
-public class ReadOnlyInventory implements IInventory
+public class ClientReadOnlyInventory implements IQueueInventory
 {
     private final int size;
     private final List<ItemStack> items;
 
-    public ReadOnlyInventory(int size)
+    public ClientReadOnlyInventory(int size)
     {
         this.size = size;
         this.items = NonNullList.withSize(size, ItemStack.EMPTY);
@@ -26,9 +27,23 @@ public class ReadOnlyInventory implements IInventory
     }
 
     @Override
+    public int getQueueLength()
+    {
+        int nonEmptySlots = 0;
+
+        for (ItemStack stack : this.items) {
+            if (!stack.isEmpty()) {
+                nonEmptySlots++;
+            }
+        }
+
+        return nonEmptySlots;
+    }
+
+    @Override
     public boolean isEmpty()
     {
-        for (ItemStack stack : items) {
+        for (ItemStack stack : this.items) {
             if (!stack.isEmpty()) {
                 return false;
             }

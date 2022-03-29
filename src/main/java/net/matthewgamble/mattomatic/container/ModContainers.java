@@ -1,6 +1,7 @@
 package net.matthewgamble.mattomatic.container;
 
 import net.matthewgamble.mattomatic.MattomaticMod;
+import net.matthewgamble.mattomatic.tileentity.ProcessQueue;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueueTile;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.tileentity.TileEntity;
@@ -34,7 +35,8 @@ public class ModContainers
                     playerInventory,
                     new IntArray(6),
                     new InsertOnlySlotItemHandler(),
-                    new ExtractOnlySlotItemHandler(1)
+                    new ExtractOnlySlotItemHandler(1),
+                    new ClientReadOnlyInventory(ProcessQueue.QUEUE_SIZE)
                 );
             } else {
                 throw new IllegalStateException("Incorrect or missing Process Queue tile entity.");

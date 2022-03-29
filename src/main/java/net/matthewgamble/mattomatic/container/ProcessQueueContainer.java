@@ -1,50 +1,57 @@
 package net.matthewgamble.mattomatic.container;
 
 import net.matthewgamble.mattomatic.block.ModBlocks;
+import net.matthewgamble.mattomatic.tileentity.IQueueInventory;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueue;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueueTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class ProcessQueueContainer extends BaseContainer
 {
     private final ProcessQueueTile tileEntity;
-    private final IItemHandlerModifiable playerInv;
     private final IIntArray data;
-    private final ReadOnlyInventory queueInv;
+    private final IInventory queueInv;
 
-    public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data, IItemHandler insertHandler, IItemHandler extractHandler)
+    public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data, IItemHandler insertHandler, IItemHandler extractHandler, IQueueInventory queueInv)
     {
         super(ModContainers.PROCESS_QUEUE_CONTAINER.get(), containerId);
 
         this.tileEntity = tileEntity;
-        this.tileEntity.addListener(this);
 
-        this.playerInv = new InvWrapper(playerInventory);
         checkContainerDataCount(data, 6);
         this.data = data;
 
-        this.addPlayerInventorySlots(this.playerInv, 8, 86);
+        this.addPlayerInventorySlots(new InvWrapper(playerInventory), 8, 86);
 
-        this.addSlot(new InsertOnlySlot(insertHandler, 0, 26, 53));
-        this.addSlot(new ExtractOnlySlot(extractHandler, 1, 134, 53));
+        this.addSlot(new InsertOnlySlot(insertHandler, 0, 26, 53) {
+            @Override
+            public boolean mayPlace(ItemStack stack)
+            {
+                if (queueInv.getQueueLength() >= ProcessQueue.QUEUE_SIZE) {
+                    return false;
+                }
 
-        this.queueInv = new ReadOnlyInventory(ProcessQueue.QUEUE_SIZE) {
+                return super.mayPlace(stack);
+            }
+
             @Override
             public void setChanged()
             {
-                super.setChanged();
-                ProcessQueueContainer.this.slotsChanged(this);
+                ProcessQueueContainer.this.broadcastChanges();
             }
-        };
+        });
+        this.addSlot(new ExtractOnlySlot(extractHandler, 1, 134, 53));
+
+        this.queueInv = queueInv;
 
         int x = 134;
         for (int i = 0; i < ProcessQueue.QUEUE_SIZE; i++) {
@@ -53,21 +60,6 @@ public class ProcessQueueContainer extends BaseContainer
         }
 
         this.addDataSlots(this.data);
-
-        this.handleQueueUpdate(this.tileEntity.getQueueItems());
-    }
-
-    public void handleQueueUpdate(Iterable<ItemStack> queue)
-    {
-        int slot = 0;
-        for (ItemStack stack : queue) {
-            this.queueInv.setItem(slot, stack);
-            slot++;
-        }
-
-        for (; slot < ProcessQueue.QUEUE_SIZE; slot++) {
-            this.queueInv.setItem(slot, ItemStack.EMPTY);
-        }
     }
 
     @Override
@@ -90,16 +82,6 @@ public class ProcessQueueContainer extends BaseContainer
             player,
             ModBlocks.PROCESS_QUEUE.get()
         );
-    }
-
-    @Override
-    public void removed(PlayerEntity player)
-    {
-        System.out.println("container removed");
-        super.removed(player);
-        if (!player.level.isClientSide) {
-            this.tileEntity.removeListener(this);
-        }
     }
 
     @Override

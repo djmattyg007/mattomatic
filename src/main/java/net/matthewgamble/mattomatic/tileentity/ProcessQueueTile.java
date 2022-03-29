@@ -4,6 +4,7 @@ import net.matthewgamble.mattomatic.container.ProcessQueueContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
@@ -31,6 +32,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 public class ProcessQueueTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity
@@ -98,8 +100,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         }
     };
 
-    private final Set<ProcessQueueContainer> activeContainers = new HashSet<>();
-
     public ProcessQueueTile(TileEntityType<?> tileEntityTypeIn)
     {
         super(tileEntityTypeIn);
@@ -129,7 +129,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 
     public Iterable<ItemStack> getQueueItems()
     {
-        System.out.println("accessed latest queue items. current size: " + this.queue.size());
         return this.queue;
     }
 
@@ -172,9 +171,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InternalAddResult fillResult = this.fillQueue(addResult.stack, simulate);
             if (!simulate && (addResult.changed || fillResult.changed)) {
                 this.setChanged();
-                this.activeContainers.forEach((container) -> {
-                    container.handleQueueUpdate(this.getQueueItems());
-                });
             }
             return fillResult.stack;
         }
@@ -199,9 +195,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             if (!simulate) {
                 this.setChanged();
                 if (fillResult.changed) {
-                    this.activeContainers.forEach((container) -> {
-                        container.handleQueueUpdate(this.getQueueItems());
-                    });
                 }
             }
             return fillResult.stack;
@@ -212,9 +205,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         if (!simulate && (addResult.changed || fillResult.changed)) {
             this.setChanged();
             if (fillResult.changed) {
-                this.activeContainers.forEach((container) -> {
-                    container.handleQueueUpdate(this.getQueueItems());
-                });
             }
         }
         return fillResult.stack;
@@ -311,18 +301,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         return extracted;
     }
 
-    public void addListener(ProcessQueueContainer container)
-    {
-        if (this.level != null && !this.level.isClientSide) {
-            this.activeContainers.add(container);
-        }
-    }
-
-    public void removeListener(ProcessQueueContainer container)
-    {
-        this.activeContainers.remove(container);
-    }
-
     public void tick()
     {
         if (this.level == null || this.level.isClientSide) {
@@ -341,9 +319,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 
         this.outputStack = this.queue.removeFirst();
         this.setChanged();
-        this.activeContainers.forEach((container) -> {
-            container.handleQueueUpdate(this.getQueueItems());
-        });
     }
 
     @Nullable
@@ -469,7 +444,16 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player)
     {
         IItemHandler invWrapper = new InvWrapper(this);
-        return new ProcessQueueContainer(windowId, this, playerInventory, this.dataAccess, invWrapper, invWrapper);
+        IQueueInventory queueInvWrapper = new QueueInvWrapper(this);
+        return new ProcessQueueContainer(
+            windowId,
+            this,
+            playerInventory,
+            this.dataAccess,
+            invWrapper,
+            invWrapper,
+            queueInvWrapper
+        );
     }
 
     public void dropAllContents(World world, BlockPos pos)
@@ -481,9 +465,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         this.queue = makeQueue();
 
         this.setChanged();
-        this.activeContainers.forEach((container) -> {
-            container.handleQueueUpdate(this.getQueueItems());
-        });
     }
 
     private class InternalAddResult
@@ -682,6 +663,86 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             }
 
             return this.inv.pullItemFromQueue(amount, simulate);
+        }
+    }
+
+    private class QueueInvWrapper implements IQueueInventory
+    {
+        private final ProcessQueueTile inv;
+
+        private QueueInvWrapper(ProcessQueueTile inv)
+        {
+            this.inv = inv;
+        }
+
+        @Override
+        public int getContainerSize()
+        {
+            return ProcessQueue.QUEUE_SIZE;
+        }
+
+        @Override
+        public int getQueueLength()
+        {
+            return this.inv.queue.size();
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return this.inv.queue.size() == 0;
+        }
+
+        @Override
+        public ItemStack getItem(int slot)
+        {
+            List<ItemStack> queue = this.inv.queue;
+            if (slot < ProcessQueue.QUEUE_SIZE && slot >= queue.size()) {
+                // This ensures that callers will still receive an exception if they
+                // request an invalid slot.
+                return ItemStack.EMPTY;
+            }
+
+            return queue.get(slot);
+        }
+
+        @Override
+        public ItemStack removeItem(int slot, int qty)
+        {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack removeItemNoUpdate(int slot)
+        {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public void setItem(int slot, ItemStack stack)
+        {
+        }
+
+        @Override
+        public void setChanged()
+        {
+        }
+
+        @Override
+        public boolean canPlaceItem(int slot, ItemStack stack)
+        {
+            return false;
+        }
+
+        @Override
+        public boolean stillValid(PlayerEntity player)
+        {
+            return true;
+        }
+
+        @Override
+        public void clearContent()
+        {
         }
     }
 }

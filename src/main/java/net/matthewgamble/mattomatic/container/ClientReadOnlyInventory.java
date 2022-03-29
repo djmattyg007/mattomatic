@@ -2,7 +2,6 @@ package net.matthewgamble.mattomatic.container;
 
 import net.matthewgamble.mattomatic.tileentity.IQueueInventory;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;

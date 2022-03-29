@@ -3,7 +3,6 @@ package net.matthewgamble.mattomatic.container;
 import net.matthewgamble.mattomatic.block.ModBlocks;
 import net.matthewgamble.mattomatic.tileentity.IQueueInventory;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueue;
-import net.matthewgamble.mattomatic.tileentity.ProcessQueueTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -17,15 +16,15 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class ProcessQueueContainer extends BaseContainer
 {
-    private final ProcessQueueTile tileEntity;
+    private final IWorldPosCallable blockLookup;
     private final IIntArray data;
     private final IInventory queueInv;
 
-    public ProcessQueueContainer(int containerId, ProcessQueueTile tileEntity, PlayerInventory playerInventory, IIntArray data, IItemHandler insertHandler, IItemHandler extractHandler, IQueueInventory queueInv)
+    public ProcessQueueContainer(int containerId, PlayerInventory playerInventory, IWorldPosCallable blockLookup, IIntArray data, IItemHandler insertHandler, IItemHandler extractHandler, IQueueInventory queueInv)
     {
         super(ModContainers.PROCESS_QUEUE_CONTAINER.get(), containerId);
 
-        this.tileEntity = tileEntity;
+        this.blockLookup = blockLookup;
 
         checkContainerDataCount(data, 6);
         this.data = data;
@@ -70,15 +69,8 @@ public class ProcessQueueContainer extends BaseContainer
             return false;
         }
 
-        if (this.tileEntity.isRemoved()) {
-            return false;
-        }
-
         return stillValid(
-            // TODO: This pos callable should be passed in through the constructor
-            // Once the listener system is eliminated (in favour of passing in another inventory for the queue),
-            // we'll no longer need to pass in the tile entity at all.
-            IWorldPosCallable.create(world, this.tileEntity.getBlockPos()),
+            this.blockLookup,
             player,
             ModBlocks.PROCESS_QUEUE.get()
         );

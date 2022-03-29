@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIntArray;
+import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -31,7 +32,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 public class ProcessQueueTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity
@@ -442,12 +442,15 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player)
     {
+        World world = player.level;
+        IWorldPosCallable blockLookup = IWorldPosCallable.create(world, this.worldPosition);
+
         IItemHandler invWrapper = new InvWrapper(this);
         IQueueInventory queueInvWrapper = new QueueInvWrapper(this);
         return new ProcessQueueContainer(
             windowId,
-            this,
             playerInventory,
+            blockLookup,
             this.dataAccess,
             invWrapper,
             invWrapper,

@@ -2,9 +2,8 @@ package net.matthewgamble.mattomatic.container;
 
 import net.matthewgamble.mattomatic.MattomaticMod;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueue;
-import net.matthewgamble.mattomatic.tileentity.ProcessQueueTile;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.IntArray;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,21 +25,17 @@ public class ModContainers
         () -> IForgeContainerType.create((containerId, playerInventory, data) -> {
             BlockPos pos = data.readBlockPos();
             World world = playerInventory.player.level;
+            IWorldPosCallable blockLookup = IWorldPosCallable.create(world, pos);
 
-            TileEntity tileEntity = world.getBlockEntity(pos);
-            if (tileEntity instanceof ProcessQueueTile) {
-                return new ProcessQueueContainer(
-                    containerId,
-                    (ProcessQueueTile) tileEntity,
-                    playerInventory,
-                    new IntArray(6),
-                    new InsertOnlySlotItemHandler(),
-                    new ExtractOnlySlotItemHandler(1),
-                    new ClientReadOnlyInventory(ProcessQueue.QUEUE_SIZE)
-                );
-            } else {
-                throw new IllegalStateException("Incorrect or missing Process Queue tile entity.");
-            }
+            return new ProcessQueueContainer(
+                containerId,
+                playerInventory,
+                blockLookup,
+                new IntArray(6),
+                new InsertOnlySlotItemHandler(),
+                new ExtractOnlySlotItemHandler(1),
+                new ClientReadOnlyInventory(ProcessQueue.QUEUE_SIZE)
+            );
         })
     );
 

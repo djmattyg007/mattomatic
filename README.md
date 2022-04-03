@@ -1,3 +1,5 @@
+![Mattomatic Logo](mattomatic.png)
+
 # Mattomatic
 
 Mattomatic is a Minecraft mod featuring a bespoke set of machines to help with some niche automation tasks.

@@ -25,6 +25,11 @@ public class MachineSideStateChangePacket implements Packet
         return new MachineSideStateChangePacket(sideId, -1);
     }
 
+    public static MachineSideStateChangePacket setToPrev(int sideId)
+    {
+        return new MachineSideStateChangePacket(sideId, -2);
+    }
+
     public void encode(PacketBuffer buffer)
     {
         buffer.writeInt(this.sideId);
@@ -48,6 +53,9 @@ public class MachineSideStateChangePacket implements Packet
                 switch (this.stateId) {
                     case -1:
                         menu.setSideStateToNext(this.sideId);
+                        break;
+                    case -2:
+                        menu.setSideStateToPrev(this.sideId);
                         break;
                     default:
                         menu.setSideState(this.sideId, this.stateId);

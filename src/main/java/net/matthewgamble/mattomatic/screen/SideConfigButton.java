@@ -19,16 +19,19 @@ public class SideConfigButton extends Button
     private static final ResourceLocation GUI = new ResourceLocation(MattomaticMod.MOD_ID, "textures/gui/btn_side_config.png");
     private static final int textureWidth = 12;
     private static final int textureHeight = 12 * 3;
+
+    protected final Button.IPressable onPressRight;
     private MachineSideState sideState = MachineSideState.INACTIVE;
 
-    public SideConfigButton(int x, int y, Button.IPressable onPress, Button.ITooltip onTooltip)
+    public SideConfigButton(int x, int y, Button.ITooltip onTooltip, Button.IPressable onPress, Button.IPressable onPressRight)
     {
         super(x, y, BTN_SIZE, BTN_SIZE, StringTextComponent.EMPTY, onPress, onTooltip);
+        this.onPressRight = onPressRight;
     }
 
-    public SideConfigButton(int x, int y, Button.IPressable onPress, Button.ITooltip onTooltip, MachineSideState currentSideState)
+    public SideConfigButton(int x, int y, MachineSideState currentSideState, Button.ITooltip onTooltip, Button.IPressable onPress, Button.IPressable onPressRight)
     {
-        this(x, y, onPress, onTooltip);
+        this(x, y, onTooltip, onPress, onPressRight);
         this.sideState = currentSideState;
     }
 
@@ -52,5 +55,31 @@ public class SideConfigButton extends Button
             this.width, this.height,
             textureWidth, textureHeight
         );
+    }
+
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+    {
+        boolean validMouseButton = mouseButton == 0 || mouseButton == 1;
+        if (validMouseButton && this.clicked(mouseX, mouseY)) {
+            this.playDownSound(Minecraft.getInstance().getSoundManager());
+            if (mouseButton == 1) {
+                this.onClickRight(mouseX, mouseY);
+            } else {
+                this.onClick(mouseX, mouseY);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public void onClickRight(double mouseX, double mouseY)
+    {
+        this.onPressRight();
+    }
+
+    public void onPressRight()
+    {
+        this.onPressRight.onPress(this);
     }
 }

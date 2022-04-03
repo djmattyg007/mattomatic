@@ -143,4 +143,11 @@ public class ProcessQueueContainer extends BaseContainer
         int nextSideState = (currentSideState % 3) + 1;
         this.setSideState(sideId, nextSideState);
     }
+
+    public void setSideStateToPrev(int sideId)
+    {
+        int currentSideState = this.getSideState(sideId).getValue();
+        int nextSideState = (currentSideState + 1) % 3 + 1;
+        this.setSideState(sideId, nextSideState);
+    }
 }

@@ -54,72 +54,90 @@ public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
         Button.IPressable btnTopHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(0));
         };
+        Button.IPressable btnTopHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(0));
+        };
         Button.ITooltip btnTopTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(0);
             String label = txtDirectionTop.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCTop = new SideConfigButton(this.leftPos + 64, this.topPos + 42, btnTopHandler, btnTopTooltip);
+        this.btnSCTop = new SideConfigButton(this.leftPos + 64, this.topPos + 42, btnTopTooltip, btnTopHandler, btnTopHandlerRight);
         this.addButton(this.btnSCTop);
 
         // btnBottom
         Button.IPressable btnBottomHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(1));
         };
+        Button.IPressable btnBottomHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(1));
+        };
         Button.ITooltip btnBottomTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(1);
             String label = txtDirectionBottom.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCBottom = new SideConfigButton(this.btnSCTop.x, this.btnSCTop.y + SideConfigButton.BTN_SIZE + 2, btnBottomHandler, btnBottomTooltip);
+        this.btnSCBottom = new SideConfigButton(this.btnSCTop.x, this.btnSCTop.y + SideConfigButton.BTN_SIZE + 2, btnBottomTooltip, btnBottomHandler, btnBottomHandlerRight);
         this.addButton(this.btnSCBottom);
 
         // btnNorth
         Button.IPressable btnNorthHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(2));
         };
+        Button.IPressable btnNorthHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(2));
+        };
         Button.ITooltip btnNorthTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(2);
             String label = txtDirectionNorth.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCNorth = new SideConfigButton(this.leftPos + 88, this.topPos + 39, btnNorthHandler, btnNorthTooltip);
+        this.btnSCNorth = new SideConfigButton(this.leftPos + 88, this.topPos + 39, btnNorthTooltip, btnNorthHandler, btnNorthHandlerRight);
         this.addButton(this.btnSCNorth);
 
         // btnSouth
         Button.IPressable btnSouthHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(3));
         };
+        Button.IPressable btnSouthHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(3));
+        };
         Button.ITooltip btnSouthTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(3);
             String label = txtDirectionSouth.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCSouth = new SideConfigButton(this.btnSCNorth.x, this.btnSCNorth.y + SideConfigButton.BTN_SIZE + 8, btnSouthHandler, btnSouthTooltip);
+        this.btnSCSouth = new SideConfigButton(this.btnSCNorth.x, this.btnSCNorth.y + SideConfigButton.BTN_SIZE + 8, btnSouthTooltip, btnSouthHandler, btnSouthHandlerRight);
         this.addButton(this.btnSCSouth);
 
         // btnEast
         Button.IPressable btnEastHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(4));
         };
+        Button.IPressable btnEastHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(4));
+        };
         Button.ITooltip btnEastTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(4);
             String label = txtDirectionEast.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCEast = new SideConfigButton(this.leftPos + 99, this.btnSCNorth.y + 10, btnEastHandler, btnEastTooltip);
+        this.btnSCEast = new SideConfigButton(this.leftPos + 99, this.btnSCNorth.y + 10, btnEastTooltip, btnEastHandler, btnEastHandlerRight);
         this.addButton(this.btnSCEast);
 
         // btnWest
         Button.IPressable btnWestHandler = (btn) -> {
             MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(5));
         };
+        Button.IPressable btnWestHandlerRight = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToPrev(5));
+        };
         Button.ITooltip btnWestTooltip = (btn, matrixStack, x, y) -> {
             MachineSideState sideState = this.menu.getSideState(5);
             String label = txtDirectionWest.getString() + tooltipLabelSep + sideState.getLabel().getString();
             this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
         };
-        this.btnSCWest = new SideConfigButton(this.btnSCEast.x - SideConfigButton.BTN_SIZE - 10, this.btnSCEast.y, btnWestHandler, btnWestTooltip);
+        this.btnSCWest = new SideConfigButton(this.btnSCEast.x - SideConfigButton.BTN_SIZE - 10, this.btnSCEast.y, btnWestTooltip, btnWestHandler, btnWestHandlerRight);
         this.addButton(this.btnSCWest);
 
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;

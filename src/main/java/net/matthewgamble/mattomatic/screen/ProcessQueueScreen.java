@@ -158,9 +158,4 @@ public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
             this.imageWidth, this.imageHeight
         );
     }
-
-    private void onContainerChange()
-    {
-
-    }
 }

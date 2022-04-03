@@ -193,8 +193,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InternalAddResult fillResult = this.fillQueue(remainder, simulate);
             if (!simulate) {
                 this.setChanged();
-                if (fillResult.changed) {
-                }
             }
             return fillResult.stack;
         }
@@ -203,8 +201,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
         InternalAddResult fillResult = this.fillQueue(addResult.stack, simulate);
         if (!simulate && (addResult.changed || fillResult.changed)) {
             this.setChanged();
-            if (fillResult.changed) {
-            }
         }
         return fillResult.stack;
     }

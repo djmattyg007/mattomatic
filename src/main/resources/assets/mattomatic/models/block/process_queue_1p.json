@@ -1,0 +1,6 @@
+{
+  "parent": "mattomatic:block/machine",
+  "textures": {
+    "front": "mattomatic:block/process_queue/front/1p"
+  }
+}

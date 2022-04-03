@@ -1,18 +1,93 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "mattomatic:block/process_queue"
+    "facing=north,fullness=empty": {
+      "model": "mattomatic:block/process_queue_empty"
     },
-    "facing=south": {
-      "model": "mattomatic:block/process_queue",
+    "facing=south,fullness=empty": {
+      "model": "mattomatic:block/process_queue_empty",
       "y": 180
     },
-    "facing=east": {
-      "model": "mattomatic:block/process_queue",
+    "facing=east,fullness=empty": {
+      "model": "mattomatic:block/process_queue_empty",
       "y": 90
     },
-    "facing=west": {
-      "model": "mattomatic:block/process_queue",
+    "facing=west,fullness=empty": {
+      "model": "mattomatic:block/process_queue_empty",
+      "y": 270
+    },
+    "facing=north,fullness=1p": {
+      "model": "mattomatic:block/process_queue_1p"
+    },
+    "facing=south,fullness=1p": {
+      "model": "mattomatic:block/process_queue_1p",
+      "y": 180
+    },
+    "facing=east,fullness=1p": {
+      "model": "mattomatic:block/process_queue_1p",
+      "y": 90
+    },
+    "facing=west,fullness=1p": {
+      "model": "mattomatic:block/process_queue_1p",
+      "y": 270
+    },
+    "facing=north,fullness=25p": {
+      "model": "mattomatic:block/process_queue_25p"
+    },
+    "facing=south,fullness=25p": {
+      "model": "mattomatic:block/process_queue_25p",
+      "y": 180
+    },
+    "facing=east,fullness=25p": {
+      "model": "mattomatic:block/process_queue_25p",
+      "y": 90
+    },
+    "facing=west,fullness=25p": {
+      "model": "mattomatic:block/process_queue_25p",
+      "y": 270
+    },
+    "facing=north,fullness=50p": {
+      "model": "mattomatic:block/process_queue_50p"
+    },
+    "facing=south,fullness=50p": {
+      "model": "mattomatic:block/process_queue_50p",
+      "y": 180
+    },
+    "facing=east,fullness=50p": {
+      "model": "mattomatic:block/process_queue_50p",
+      "y": 90
+    },
+    "facing=west,fullness=50p": {
+      "model": "mattomatic:block/process_queue_50p",
+      "y": 270
+    },
+    "facing=north,fullness=75p": {
+      "model": "mattomatic:block/process_queue_75p"
+    },
+    "facing=south,fullness=75p": {
+      "model": "mattomatic:block/process_queue_75p",
+      "y": 180
+    },
+    "facing=east,fullness=75p": {
+      "model": "mattomatic:block/process_queue_75p",
+      "y": 90
+    },
+    "facing=west,fullness=75p": {
+      "model": "mattomatic:block/process_queue_75p",
+      "y": 270
+    },
+    "facing=north,fullness=100p": {
+      "model": "mattomatic:block/process_queue_100p"
+    },
+    "facing=south,fullness=100p": {
+      "model": "mattomatic:block/process_queue_100p",
+      "y": 180
+    },
+    "facing=east,fullness=100p": {
+      "model": "mattomatic:block/process_queue_100p",
+      "y": 90
+    },
+    "facing=west,fullness=100p": {
+      "model": "mattomatic:block/process_queue_100p",
       "y": 270
     }
   }

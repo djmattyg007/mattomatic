@@ -1,5 +1,7 @@
 package net.matthewgamble.mattomatic.tileentity;
 
+import net.matthewgamble.mattomatic.block.Fullness;
+import net.matthewgamble.mattomatic.block.ProcesssQueueBlock;
 import net.matthewgamble.mattomatic.container.ProcessQueueContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -145,12 +147,22 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
 
     public int getQueueLengthPercentInt()
     {
-        return (int) Math.ceil(this.getQueueLengthPercent());
+        return (int) Math.ceil(this.getQueueLengthPercent() * 100);
     }
 
     public int getMaxStackSize()
     {
         return 64;
+    }
+
+    public void setChanged()
+    {
+        if (this.level != null) {
+            BlockState blockState = this.level.getBlockState(this.worldPosition);
+            this.level.setBlockAndUpdate(this.worldPosition, blockState.setValue(ProcesssQueueBlock.FULLNESS, Fullness.fromFraction(this.getQueueLengthPercent())));
+        }
+
+        super.setChanged();
     }
 
     public ItemStack addItemToQueue(ItemStack newItem)
@@ -461,8 +473,6 @@ public class ProcessQueueTile extends TileEntity implements INamedContainerProvi
             InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), queueItemStack);
         }
         this.queue = makeQueue();
-
-        this.setChanged();
     }
 
     private class InternalAddResult

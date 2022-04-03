@@ -9,6 +9,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -25,9 +26,12 @@ import javax.annotation.Nullable;
 
 public class ProcesssQueueBlock extends HorizontalBlock implements ITileEntityProvider
 {
+    public static final EnumProperty<Fullness> FULLNESS = BlockStateProperties.FULLNESS;
+
     public ProcesssQueueBlock(Properties properties)
     {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FULLNESS, Fullness.EMPTY));
     }
 
     @Nullable
@@ -53,19 +57,13 @@ public class ProcesssQueueBlock extends HorizontalBlock implements ITileEntityPr
     @Override
     protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> stateBuilder)
     {
-        stateBuilder.add(FACING);
+        stateBuilder.add(FACING, FULLNESS);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        Direction facing = context.getHorizontalDirection();
-        PlayerEntity player = context.getPlayer();
-        if (!(player != null && player.isCrouching())) {
-            facing = facing.getOpposite();
-        }
-
-        return this.defaultBlockState().setValue(FACING, facing);
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override

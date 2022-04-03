@@ -110,6 +110,7 @@ public class ProcesssQueueBlock extends HorizontalBlock implements ITileEntityPr
             if (tileEntity instanceof ProcessQueueTile) {
                 ProcessQueueTile processQueueTile = (ProcessQueueTile) tileEntity;
                 processQueueTile.dropAllContents(world, pos);
+                world.updateNeighbourForOutputSignal(pos, this);
             }
         }
 

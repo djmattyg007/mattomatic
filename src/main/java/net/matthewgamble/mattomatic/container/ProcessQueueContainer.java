@@ -2,6 +2,7 @@ package net.matthewgamble.mattomatic.container;
 
 import net.matthewgamble.mattomatic.block.ModBlocks;
 import net.matthewgamble.mattomatic.tileentity.IQueueInventory;
+import net.matthewgamble.mattomatic.tileentity.MachineSideState;
 import net.matthewgamble.mattomatic.tileentity.ProcessQueue;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -123,5 +124,23 @@ public class ProcessQueueContainer extends BaseContainer
         }
         sourceSlot.onTake(player, sourceStack);
         return sourceStackCopy;
+    }
+
+    public MachineSideState getSideState(int sideId)
+    {
+        int stateId = this.data.get(sideId);
+        return MachineSideState.fromStateId(stateId);
+    }
+
+    public void setSideState(int sideId, int stateId)
+    {
+        this.data.set(sideId, stateId);
+    }
+
+    public void setSideStateToNext(int sideId)
+    {
+        int currentSideState = this.getSideState(sideId).getValue();
+        int nextSideState = (currentSideState % 3) + 1;
+        this.setSideState(sideId, nextSideState);
     }
 }

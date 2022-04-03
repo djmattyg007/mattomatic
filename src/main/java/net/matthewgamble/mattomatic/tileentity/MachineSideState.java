@@ -1,5 +1,8 @@
 package net.matthewgamble.mattomatic.tileentity;
 
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+
 public enum MachineSideState
 {
     INACTIVE("inactive", 1),
@@ -8,11 +11,13 @@ public enum MachineSideState
 
     private final String name;
     private final int stateId;
+    private final ITextComponent label;
 
     private MachineSideState(String name, int stateId)
     {
         this.name = name;
         this.stateId = stateId;
+        this.label = new TranslationTextComponent("mattomatic.side_config.state." + name);
     }
 
     public static MachineSideState fromStateId(int stateId)
@@ -42,5 +47,10 @@ public enum MachineSideState
     public String getSerializedName()
     {
         return this.name;
+    }
+
+    public ITextComponent getLabel()
+    {
+        return this.label;
     }
 }

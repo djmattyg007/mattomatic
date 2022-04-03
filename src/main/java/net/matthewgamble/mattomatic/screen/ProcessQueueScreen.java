@@ -3,10 +3,12 @@ package net.matthewgamble.mattomatic.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.matthewgamble.mattomatic.MattomaticMod;
+import net.matthewgamble.mattomatic.MattomaticNet;
 import net.matthewgamble.mattomatic.container.ProcessQueueContainer;
+import net.matthewgamble.mattomatic.packets.MachineSideStateChangePacket;
+import net.matthewgamble.mattomatic.tileentity.MachineSideState;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
@@ -18,14 +20,23 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
 {
-    private final ResourceLocation GUI_SCREEN = new ResourceLocation(MattomaticMod.MOD_ID, "textures/gui/process_queue.png");
-    private final ResourceLocation GUI_BTN_HORIZ = new ResourceLocation(MattomaticMod.MOD_ID, "textures/gui/btn_horiz.png");
-    private final ResourceLocation GUI_BTN_VERT = new ResourceLocation(MattomaticMod.MOD_ID, "textures/gui/btn_vert.png");
+    private static final ResourceLocation GUI_SCREEN = new ResourceLocation(MattomaticMod.MOD_ID, "textures/gui/process_queue.png");
+
+    private static final ITextComponent txtDirectionTop = new TranslationTextComponent("mattomatic.side_config.direction.top");
+    private static final ITextComponent txtDirectionBottom = new TranslationTextComponent("mattomatic.side_config.direction.bottom");
+    private static final ITextComponent txtDirectionNorth = new TranslationTextComponent("mattomatic.side_config.direction.north");
+    private static final ITextComponent txtDirectionSouth = new TranslationTextComponent("mattomatic.side_config.direction.south");
+    private static final ITextComponent txtDirectionEast = new TranslationTextComponent("mattomatic.side_config.direction.east");
+    private static final ITextComponent txtDirectionWest = new TranslationTextComponent("mattomatic.side_config.direction.west");
 
     protected int imageHeight = 168;
 
-    private ImageButton btnHoriz;
-    private ImageButton btnVert;
+    private SideConfigButton btnSCTop;
+    private SideConfigButton btnSCBottom;
+    private SideConfigButton btnSCNorth;
+    private SideConfigButton btnSCSouth;
+    private SideConfigButton btnSCEast;
+    private SideConfigButton btnSCWest;
 
     public ProcessQueueScreen(ProcessQueueContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
@@ -37,19 +48,79 @@ public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
     {
         super.init();
 
-//        Button.IPressable btnHorizHandler = (btnHoriz) -> {};
-//        Button.ITooltip btnHorizTooltip = (btn, matrixStack, x, y) -> {
-//            this.renderTooltip(matrixStack, this.font.split(new TranslationTextComponent("mattomatic.process_queue.button.horizontal.tooltip"), Math.max(this.width / 2 - 43, 170)), x, y);
-//        };
-//        this.btnHoriz = new ImageButton(this.leftPos + 70, this.topPos + 52, 20, 18, 0, 0, 19, GUI_BTN_HORIZ, 256, 256, btnHorizHandler, btnHorizTooltip, StringTextComponent.EMPTY);
-//        this.addButton(btnHoriz);
-//
-//        Button.IPressable btnVertHandler = (btnVert) -> {};
-//        Button.ITooltip btnVertTooltip = (btn, matrixStack, x, y) -> {
-//            this.renderTooltip(matrixStack, this.font.split(new TranslationTextComponent("mattomatic.process_queue.button.vertical.tooltip"), Math.max(this.width / 2 - 43, 170)), x, y);
-//        };
-//        this.btnVert = new ImageButton(this.leftPos + 95, this.topPos + 52, 20, 18, 0, 0, 19, GUI_BTN_VERT, 256, 256, btnVertHandler, btnVertTooltip, StringTextComponent.EMPTY);
-//        this.addButton(btnVert);
+        String tooltipLabelSep = " - ";
+
+        // btnTop
+        Button.IPressable btnTopHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(0));
+        };
+        Button.ITooltip btnTopTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(0);
+            String label = txtDirectionTop.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCTop = new SideConfigButton(this.leftPos + 64, this.topPos + 42, btnTopHandler, btnTopTooltip);
+        this.addButton(this.btnSCTop);
+
+        // btnBottom
+        Button.IPressable btnBottomHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(1));
+        };
+        Button.ITooltip btnBottomTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(1);
+            String label = txtDirectionBottom.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCBottom = new SideConfigButton(this.btnSCTop.x, this.btnSCTop.y + SideConfigButton.BTN_SIZE + 2, btnBottomHandler, btnBottomTooltip);
+        this.addButton(this.btnSCBottom);
+
+        // btnNorth
+        Button.IPressable btnNorthHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(2));
+        };
+        Button.ITooltip btnNorthTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(2);
+            String label = txtDirectionNorth.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCNorth = new SideConfigButton(this.leftPos + 88, this.topPos + 39, btnNorthHandler, btnNorthTooltip);
+        this.addButton(this.btnSCNorth);
+
+        // btnSouth
+        Button.IPressable btnSouthHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(3));
+        };
+        Button.ITooltip btnSouthTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(3);
+            String label = txtDirectionSouth.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCSouth = new SideConfigButton(this.btnSCNorth.x, this.btnSCNorth.y + SideConfigButton.BTN_SIZE + 8, btnSouthHandler, btnSouthTooltip);
+        this.addButton(this.btnSCSouth);
+
+        // btnEast
+        Button.IPressable btnEastHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(4));
+        };
+        Button.ITooltip btnEastTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(4);
+            String label = txtDirectionEast.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCEast = new SideConfigButton(this.leftPos + 99, this.btnSCNorth.y + 10, btnEastHandler, btnEastTooltip);
+        this.addButton(this.btnSCEast);
+
+        // btnWest
+        Button.IPressable btnWestHandler = (btn) -> {
+            MattomaticNet.messageServer(MachineSideStateChangePacket.setToNext(5));
+        };
+        Button.ITooltip btnWestTooltip = (btn, matrixStack, x, y) -> {
+            MachineSideState sideState = this.menu.getSideState(5);
+            String label = txtDirectionWest.getString() + tooltipLabelSep + sideState.getLabel().getString();
+            this.renderTooltip(matrixStack, this.font.split(new StringTextComponent(label), Math.max(this.width / 2 - 43, 170)), x, y);
+        };
+        this.btnSCWest = new SideConfigButton(this.btnSCEast.x - SideConfigButton.BTN_SIZE - 10, this.btnSCEast.y, btnWestHandler, btnWestTooltip);
+        this.addButton(this.btnSCWest);
 
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
     }
@@ -57,9 +128,21 @@ public class ProcessQueueScreen extends ContainerScreen<ProcessQueueContainer>
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
+        this.btnSCTop.setSideState(this.menu.getSideState(0));
+        this.btnSCBottom.setSideState(this.menu.getSideState(1));
+        this.btnSCNorth.setSideState(this.menu.getSideState(2));
+        this.btnSCSouth.setSideState(this.menu.getSideState(3));
+        this.btnSCEast.setSideState(this.menu.getSideState(4));
+        this.btnSCWest.setSideState(this.menu.getSideState(5));
+
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.buttons.forEach((button) -> {
+            if (button.isHovered()) {
+                button.renderToolTip(matrixStack, mouseX, mouseY);
+            }
+        });
     }
 
     @Override

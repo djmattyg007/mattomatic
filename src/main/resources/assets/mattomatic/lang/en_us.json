@@ -2,6 +2,13 @@
   "item.mattomatic.process_queue": "Process Queue",
   "block.mattomatic.process_queue": "Process Queue",
   "screen.mattomatic.process_queue": "Process Queue",
-  "mattomatic.process_queue.button.horizontal.tooltip": "Move items from left to right",
-  "mattomatic.process_queue.button.vertical.tooltip": "Move items from top to bottom"
+  "mattomatic.side_config.direction.top": "Top",
+  "mattomatic.side_config.direction.bottom": "Bottom",
+  "mattomatic.side_config.direction.north": "North",
+  "mattomatic.side_config.direction.south": "South",
+  "mattomatic.side_config.direction.east": "East",
+  "mattomatic.side_config.direction.west": "West",
+  "mattomatic.side_config.state.inactive": "Inactive",
+  "mattomatic.side_config.state.input": "Input",
+  "mattomatic.side_config.state.output": "Output"
 }

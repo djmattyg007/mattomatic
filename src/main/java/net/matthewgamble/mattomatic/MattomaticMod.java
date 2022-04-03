@@ -68,9 +68,9 @@ public class MattomaticMod
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        event.enqueueWork(() -> {
+            MattomaticNet.registerPackets();
+        });
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
